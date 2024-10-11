@@ -18,6 +18,12 @@ namespace HousingLocation.Models
 
         public bool Loundry { get; set; }
 
+        public string Price { get; set; }
+
+        public bool IsNew { get; set; }
+
+        public Status Status { get; set; }
+
         [ForeignKey(nameof(CreatedUser))]
         public int CreatedUserId { get; set; }
 

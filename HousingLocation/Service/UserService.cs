@@ -30,7 +30,14 @@ public class UserService(HousingLocationContext _context, IMapper _mapper) : IUs
 
     public async Task<ServiceResultBase<List<UserDto>>> GetAllUsers()
     {
-        var users = await _context.Users.ToListAsync();
+        var users = await _context.Users.Select(x => new User
+        {
+            UserId = x.UserId,
+            UserName = x.UserName,
+            UserLastName = x.UserLastName,
+            Email = x.Email,
+            Password = "password"
+        }).ToListAsync();
 
         var usersDto = _mapper.Map<List<UserDto>>(users);
 
@@ -49,12 +56,12 @@ public class UserService(HousingLocationContext _context, IMapper _mapper) : IUs
 
     }
 
-    public async Task<ServiceResultBase<UserDto>> UpdateUser(UserDto userDto)
+    public async Task<ServiceResultBase<bool>> UpdateUser(UserDto userDto)
     {
         var hasDbUser = await _context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.UserId == userDto.UserId);
 
         if (hasDbUser == null)
-            return new NotFoundServiceResult<UserDto>();
+            return new NotFoundServiceResult<bool>();
 
         var user = new User
         {
@@ -62,14 +69,35 @@ public class UserService(HousingLocationContext _context, IMapper _mapper) : IUs
             Email = userDto.Email,
             UserLastName = userDto.UserLastName,
             UserName = userDto.UserName,
-            Password = PasswordHasher.ComputeHash(userDto.Password, _papper, _iteration)
         };
 
         _context.Users.Entry(user).State = EntityState.Modified;
 
         await _context.SaveChangesAsync();
 
-        return _mapper.Map<UserDto>(user);
+        return new OkServiceResult<bool>(_mapper.Map<bool>(user));
+    }
+
+    public async Task<ServiceResultBase<bool>> ChangePassword(ChangePassword changePassword, int userId)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(x => x.UserId == userId);
+
+        if (user == null) return new NotFoundServiceResult<bool>();
+
+        var hashNewPassword = PasswordHasher.ComputeHash(changePassword.OldPassword, _papper, _iteration);
+
+        if (hashNewPassword != user.Password)
+        {
+            return new BadRequesServiceResult<bool>("Old password is incorrect");
+        }
+
+        user.Password = PasswordHasher.ComputeHash(changePassword.NewPassword,_papper,_iteration);
+
+        _context.Entry(user).State = EntityState.Modified;
+
+        await _context.SaveChangesAsync();
+
+        return new OkServiceResult<bool>(true);
     }
 
     public async Task<User> GetUserByEmail(string email)

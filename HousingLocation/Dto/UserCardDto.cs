@@ -7,9 +7,13 @@ namespace HousingLocation.Dto
     {
         public int Id { get; set; }
 
+        public bool IsNew { get; set; }
+
         public int HouseId { get; set; }
 
         public int BuyerUserId { get; set; }
+
+        public bool IsAccepted { get; set; }
 
     }
 }

@@ -47,8 +47,9 @@ builder.Services.AddAutoMapper(option =>
     option.CreateMap<Photo, PhotoDto>().ReverseMap();
     option.CreateMap<User, UserDto>().ReverseMap();
     option.CreateMap<UserCard, UserCardDto>().ReverseMap();
+    
 });
-
+    
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddCors(opt =>

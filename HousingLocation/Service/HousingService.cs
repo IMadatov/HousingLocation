@@ -18,27 +18,31 @@ namespace HousingLocation.Service
 
         private readonly HousingLocationContext _context;
         private readonly IMapper _mapper;
-        public HousingService(HousingLocationContext context, IMapper mapper)
+        private readonly IImageService _imageService;
+        public HousingService(HousingLocationContext context, IMapper mapper,IImageService imageService)
         {
             _context = context;
             _mapper = mapper;
+            _imageService = imageService;
         }
 
 
         public async Task<ServiceResultBase<List<HouseDto>>> GetAllHousesAsync()
         {
             var housesList = _context.Houses;
-            var houreCard = _context.UserCards;
+            //var houreCard = _context.UserCards;
 
-            var rightOuter = from house in housesList
-                             join card in houreCard
-                             on house.HouseId equals card.HouseId into houseUserCardGroup
-                             from card in houseUserCardGroup.DefaultIfEmpty()
-                             where house.HouseId != card.HouseId
-                             select house;
+            //var rightOuter = from house in housesList
+            //                 join card in houreCard
+            //                 on house.HouseId equals card.HouseId into houseUserCardGroup
+            //                 from card in houseUserCardGroup.DefaultIfEmpty()
+            //                 where house.HouseId != card.HouseId
+            //                 select house;
 
 
-            var list = await rightOuter.ToListAsync();
+            //var list = await rightOuter.ToListAsync();
+
+            var list =await housesList.Where(x => x.Status != Status.Sold).ToListAsync();
             if (list == null)
             {
                 return new NotFoundServiceResult<List<HouseDto>>();
@@ -106,6 +110,11 @@ namespace HousingLocation.Service
                 return new NotFoundServiceResult<string>();
             if (house.CreatedUserId != idUser) return new BadRequesServiceResult<string>();
 
+            var card= await _context.UserCards.FirstOrDefaultAsync(x => x.HouseId==house.HouseId);
+
+            if (card != null)
+                _context.UserCards.Remove(card);
+            await _imageService.DeleteImageAsync(house.PhotoId!.Value);
             _context.Houses.Remove(house);
 
             await _context.SaveChangesAsync();

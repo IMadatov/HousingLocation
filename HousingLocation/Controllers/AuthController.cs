@@ -104,6 +104,11 @@ namespace HousingLocation.Controllers
 
             var user = await _context.Users.FirstOrDefaultAsync(x=>x.UserId==int.Parse(id));
 
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
             var userInfoDto = new UserInfoDto
             {
                 UserId = user.UserId,

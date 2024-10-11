@@ -22,6 +22,14 @@ namespace HousingLocation.Controllers
         public async Task<ActionResult<UserCardDto>> GetUserCard(int id) =>
             await FromServiceResultBaseAsync(_service.GetUserCard(id));
 
+        [HttpGet]
+        public async Task<ActionResult<List<UserCardDto>>> GetInCardsMyHouse()
+        {
+            var userId=HttpContext.User.Claims.FirstOrDefault(x=>x.Type==ClaimTypes.NameIdentifier)?.Value;
+            return await FromServiceResultBaseAsync(_service.GetInCardsMyHouse(int.Parse(userId)));
+        }
+            
+
         [HttpPost("{id:int}")]
         public async Task<ActionResult<UserCardDto>> PostUserCard(int id)
         {
@@ -30,17 +38,19 @@ namespace HousingLocation.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<string>> DeleteUserCard(int id) =>
+        public async Task<ActionResult> DeleteUserCard(int id) =>
             await FromServiceResultBaseAsync(_service.DeleteUserCard(id));
 
+        
         [HttpPut]
-        public async Task<ActionResult<bool>> AddToCard(int id)
+        public async Task<ActionResult<bool>> OldCard(List<UserCardDto> userCardDtos)
         {
-            var userId=HttpContext.User.Claims.FirstOrDefault(x=>x.Type==ClaimTypes.NameIdentifier)?.Value;
-
-            return await FromServiceResultBaseAsync(_service.AddToCard(id, int.Parse(userId)));
+            return await FromServiceResultBaseAsync(_service.OldCard(userCardDtos));
         }
-
+        [HttpPut("{cardId}")]
+        public async Task<ActionResult<bool>> AcceptedCard(int cardId)=>
+             await FromServiceResultBaseAsync(_service.AcceptedCard(cardId));
+        
         protected async Task<ActionResult> FromServiceResultBaseAsync<T>(Task<ServiceResultBase<T>> task)
         {
             var result = await task;
@@ -53,7 +63,7 @@ namespace HousingLocation.Controllers
             {
                 return StatusCode(result.StatusCode, result.Result);
             }
-            return StatusCode(result.StatusCode, "Request failed");
+            return StatusCode(result.StatusCode, result.StatusMessage);
         }
     }
 }

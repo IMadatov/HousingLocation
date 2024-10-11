@@ -7,6 +7,10 @@ namespace HousingLocation.Models
     {
         public int Id { get; set; } 
 
+        public bool IsNew {  get; set; }    
+
+        public bool IsAccepted {  get; set; }
+
         [ForeignKey(nameof(House))]
         public int HouseId { get; set; }
 

@@ -26,12 +26,12 @@ namespace HousingLocation.Service
             var image = await _context.Images.FirstOrDefaultAsync(x => x.PhotoId == id);
             if (image == null)
                 return new NotFoundServiceResult<string>();
-            _context.Images.Remove(image);
             
             var filePath = Path.Combine(@"C:\ImageToDoProject\", image.FileName);
             
             try{
                 File.Delete(filePath);
+                _context.Images.Remove(image);
             }catch (Exception ex) 
             {
                 Console.WriteLine(ex.Message);

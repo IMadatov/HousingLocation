@@ -19,6 +19,12 @@ namespace HousingLocation.Dto
 
         public bool Loundry { get; set; }
 
+        public string Price { get; set; }
+
+        public bool IsNew { get; set; }
+
+        public Status Status { get; set; }
+
         public int CreatedUserId { get; set; }
 
         public int? PhotoId { get; set; }

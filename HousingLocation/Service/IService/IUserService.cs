@@ -8,9 +8,10 @@ namespace HousingLocation.Service.IService
     {
         Task<ServiceResultBase<List<UserDto>>> GetAllUsers();
         Task<ServiceResultBase<UserDto>> GetUser(int id);
-        Task<ServiceResultBase<UserDto>> UpdateUser(UserDto userDto);
+        Task<ServiceResultBase<bool>> UpdateUser(UserDto userDto);
         Task<ServiceResultBase<string>> DeleteUser(int id);
         Task<User> GetUserByEmail(string email);
         Task<ServiceResultBase<UserInfoDto>> GetUserInfoById(int id);
+        Task<ServiceResultBase<bool>> ChangePassword(ChangePassword changePassword, int userId);
     }
 }

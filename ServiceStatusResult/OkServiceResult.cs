@@ -9,7 +9,7 @@ namespace ServiceStatusResult
     public class OkServiceResult<T>:ServiceResultBase<T>
     {
      
-        public OkServiceResult():base(200,null,default)
+        public OkServiceResult() :base(200,null,default)
         {
 
         }
